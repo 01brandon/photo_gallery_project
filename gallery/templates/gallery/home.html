@@ -1,96 +1,34 @@
 {% extends 'base.html' %}
-
-{% block title %}Home - Photo Gallery{% endblock %}
-
+{% block title %}Photo Gallery{% endblock %}
 {% block content %}
-    <div>
-        <h1 class="section-title">Photo Gallery</h1>
-
-        <div class="card mb-4">
-            <form method="get" style="display: flex; flex-wrap: wrap; gap: 1rem;">
-                <div style="flex: 1; min-width: 250px;">
-                    <label class="form-label">Search</label>
-                    <input 
-                        type="text" 
-                        name="search" 
-                        class="form-input" 
-                        placeholder="Search by title or description"
-                        value="{{ search_query }}"
-                    >
-                </div>
-
-                <div style="flex: 1;">
-                    <label class="form-label">Filter by Tags</label>
-                    <div style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 150px; overflow-y: auto;">
-                        {% for tag in tags %}
-                            <label style="display: flex; align-items: center; gap: 0.5rem;">
-                                <input 
-                                    type="checkbox" 
-                                    name="tags" 
-                                    value="{{ tag.id }}"
-                                    {% if tag.id|stringformat:"s" in selected_tags %}checked{% endif %}
-                                    style="cursor: pointer;"
-                                >
-                                {{ tag.name }}
-                            </label>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
-                    <button type="submit" class="btn-primary">Search</button>
-                    <a href="{% url 'home' %}" class="btn-secondary">Clear</a>
-                </div>
-            </form>
-        </div>
-
-        {% if photos %}
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 2rem;">
-                {% for photo in photos %}
-                    <div class="photo-card">
-                        <a href="{% url 'photo_detail' photo.id %}" style="text-decoration: none;">
-                            {% if photo.image %}
-                                <img src="{{ photo.image.url }}" alt="{{ photo.title }}">
-                            {% else %}
-                                <div style="width: 100%; height: 250px; background-color: var(--light); display: flex; align-items: center; justify-content: center; color: var(--secondary);">
-                                    No Image
-                                </div>
-                            {% endif %}
-                        </a>
-                        <div class="photo-info">
-                            <h3 style="margin: 0 0 0.5rem 0; font-weight: 600; color: var(--primary);">
-                                <a href="{% url 'photo_detail' photo.id %}" style="text-decoration: none; color: var(--primary);">
-                                    {{ photo.title }}
-                                </a>
-                            </h3>
-                            <p class="text-muted" style="margin: 0 0 0.5rem 0;">
-                                by <a href="{% url 'profile' photo.user.username %}" style="text-decoration: none; color: var(--accent);">{{ photo.user.username }}</a>
-                            </p>
-                            
-                            {% if photo.tags.all %}
-                                <div style="margin-bottom: 0.5rem;">
-                                    {% for tag in photo.tags.all %}
-                                        <span class="tag-badge">{{ tag.name }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-
-                            <div class="interaction-buttons">
-                                <span style="font-size: 0.875rem; color: var(--secondary);">
-                                    <i class="fas fa-heart" style="color: var(--error);"></i> {{ photo.likes.count }}
-                                </span>
-                                <span style="font-size: 0.875rem; color: var(--secondary);">
-                                    <i class="fas fa-thumbs-down" style="color: var(--secondary);"></i> {{ photo.dislikes.count }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="card text-center">
-                <p class="text-muted">No photos found. Try adjusting your search or filters.</p>
-            </div>
-        {% endif %}
+<div>
+    <h1 class="section-title">Photo Gallery</h1>
+    <div style="margin-bottom: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <input type="text" id="search-box" placeholder="Search photos..." style="flex: 1; min-width: 200px; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--bg-secondary); color: var(--text);">
     </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem;">
+        {% for photo in photos %}
+        <a href="{% url 'photo_detail' photo.id %}" style="text-decoration: none; color: inherit;">
+            <div style="background: var(--bg-secondary); border-radius: 0.5rem; overflow: hidden; transition: transform 0.2s;">
+                <img src="{{ photo.image.url }}" alt="{{ photo.title }}" style="width: 100%; height: 200px; object-fit: cover; display: block;">
+                <div style="padding: 1rem;">
+                    <h3 style="margin: 0 0 0.5rem 0; font-size: 1rem;">{{ photo.title }}</h3>
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">by {{ photo.user.username }}</p>
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <p class="text-muted">No photos yet. <a href="{% url 'upload_photo' %}" style="color: var(--accent); text-decoration: none;">Upload one!</a></p>
+        {% endfor %}
+    </div>
+</div>
+<script>
+    document.getElementById('search-box').addEventListener('input', function() {
+        const query = this.value.toLowerCase();
+        document.querySelectorAll('a[href*="/photo/"]').forEach(link => {
+            const title = link.querySelector('h3').textContent.toLowerCase();
+            link.style.display = title.includes(query) ? '' : 'none';
+        });
+    });
+</script>
 {% endblock %}

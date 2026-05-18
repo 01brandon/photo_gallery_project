@@ -1,101 +1,21 @@
-{% extends 'base.html' %} {% block title %}My Photos - Photo Gallery{% endblock
-%} {% block content %}
+{% extends 'base.html' %}
+{% block title %}My Photos - Photo Gallery{% endblock %}
+{% block content %}
 <div>
-  <h1 class="section-title">My Photos</h1>
-
-  {% if photos %}
-  <div
-    style="
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 2rem;
-    "
-  >
-    {% for photo in photos %}
-    <div class="photo-card">
-      <a href="{% url 'photo_detail' photo.id %}" style="text-decoration: none">
-        {% if photo.image %}
-        <img src="{{ photo.image.url }}" alt="{{ photo.title }}" />
-        {% else %}
-        <div
-          style="
-            width: 100%;
-            height: 250px;
-            background-color: var(--light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--secondary);
-          "
-        >
-          No Image
-        </div>
-        {% endif %}
-      </a>
-      <div class="photo-info">
-        <h3
-          style="margin: 0 0 0.5rem 0; font-weight: 600; color: var(--primary)"
-        >
-          <a
-            href="{% url 'photo_detail' photo.id %}"
-            style="text-decoration: none; color: var(--primary)"
-          >
-            {{ photo.title }}
-          </a>
-        </h3>
-
-        {% if photo.tags.all %}
-        <div style="margin-bottom: 0.5rem">
-          {% for tag in photo.tags.all %}
-          <span class="tag-badge">{{ tag.name }}</span>
-          {% endfor %}
-        </div>
-        {% endif %}
-
-        <div class="interaction-buttons" style="margin-top: 1rem">
-          <a
-            href="{% url 'edit_photo' photo.id %}"
-            class="btn-primary"
-            style="flex: 1; text-align: center"
-          >
-            Edit
-          </a>
-          <a
-            href="{% url 'delete_photo' photo.id %}"
-            class="btn-danger"
-            style="flex: 1; text-align: center"
-          >
-            Delete
-          </a>
-        </div>
-
-        <div style="margin-top: 0.5rem">
-          <span style="font-size: 0.875rem; color: var(--secondary)">
-            <i class="fas fa-heart" style="color: var(--error)"></i> {{
-            photo.likes.count }}
-          </span>
-          <span
-            style="
-              font-size: 0.875rem;
-              color: var(--secondary);
-              margin-left: 1rem;
-            "
-          >
-            <i class="fas fa-thumbs-down" style="color: var(--secondary)"></i>
-            {{ photo.dislikes.count }}
-          </span>
-        </div>
-      </div>
+    <h1 class="section-title">My Photos</h1>
+    <a href="{% url 'upload_photo' %}" class="btn-primary" style="display: inline-block; margin-bottom: 1.5rem; text-decoration: none;">Upload New Photo</a>
+    <div class="gallery-grid">
+        {% for photo in photos %}
+        <a href="{% url 'photo_detail' photo.id %}" style="text-decoration: none; color: inherit;">
+            <div class="gallery-item">
+                <img src="{{ photo.image.url }}" alt="{{ photo.title }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 0.5rem;">
+                <h3 style="margin: 0.75rem 0 0.25rem 0;">{{ photo.title }}</h3>
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">{{ photo.created_at|date:'M d, Y' }}</p>
+            </div>
+        </a>
+        {% empty %}
+        <p class="text-muted">You haven't uploaded any photos yet. <a href="{% url 'upload_photo' %}" style="color: var(--accent); text-decoration: none;">Upload one now!</a></p>
+        {% endfor %}
     </div>
-    {% endfor %}
-  </div>
-  {% else %}
-  <div class="card text-center">
-    <p class="text-muted">You haven't uploaded any photos yet.</p>
-    <a href="{% url 'upload_photo' %}" class="btn-primary"
-      >Upload Your First Photo</a
-    >
-  </div>
-  {% endif %}
 </div>
 {% endblock %}
