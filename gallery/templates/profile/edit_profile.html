@@ -1,0 +1,102 @@
+{% extends 'base.html' %} {% block title %}Edit Profile - Photo Gallery{%
+endblock %} {% block content %}
+<div style="max-width: 600px; margin: 0 auto">
+  <h1 class="section-title">Edit Profile</h1>
+
+  <form method="post" enctype="multipart/form-data" class="card">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label for="{{ form.username.id_for_label }}" class="form-label"
+        >{{ form.username.label }}</label
+      >
+      {{ form.username }} {% if form.username.errors %}
+      <p style="color: var(--error); font-size: 0.875rem; margin-top: 0.25rem">
+        {{ form.username.errors.0 }}
+      </p>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.email.id_for_label }}" class="form-label"
+        >{{ form.email.label }}</label
+      >
+      {{ form.email }} {% if form.email.errors %}
+      <p style="color: var(--error); font-size: 0.875rem; margin-top: 0.25rem">
+        {{ form.email.errors.0 }}
+      </p>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.first_name.id_for_label }}" class="form-label"
+        >{{ form.first_name.label }}</label
+      >
+      {{ form.first_name }}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.last_name.id_for_label }}" class="form-label"
+        >{{ form.last_name.label }}</label
+      >
+      {{ form.last_name }}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.bio.id_for_label }}" class="form-label"
+        >{{ form.bio.label }}</label
+      >
+      {{ form.bio }} {% if form.bio.errors %}
+      <p style="color: var(--error); font-size: 0.875rem; margin-top: 0.25rem">
+        {{ form.bio.errors.0 }}
+      </p>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.profile_picture.id_for_label }}" class="form-label"
+        >{{ form.profile_picture.label }}</label
+      >
+      {% if request.user.profile_picture %}
+      <div style="margin-bottom: 1rem">
+        <p class="text-muted">Current profile picture:</p>
+        <img
+          src="{{ request.user.profile_picture.url }}"
+          alt="Profile Picture"
+          class="profile-picture"
+          style="width: 100px; height: 100px"
+        />
+      </div>
+      {% endif %} {{ form.profile_picture }} {% if form.profile_picture.errors
+      %}
+      <p style="color: var(--error); font-size: 0.875rem; margin-top: 0.25rem">
+        {{ form.profile_picture.errors.0 }}
+      </p>
+      {% endif %}
+    </div>
+
+    <div style="display: flex; gap: 1rem">
+      <button type="submit" class="btn-primary">Save Changes</button>
+      <a href="{% url 'profile' user.username %}" class="btn-secondary"
+        >Cancel</a
+      >
+    </div>
+  </form>
+</div>
+
+<script>
+  document
+    .querySelectorAll(
+      'input[type="text"], input[type="email"], textarea, input[type="file"]',
+    )
+    .forEach((el) => {
+      if (el.id && !el.classList.contains("form-input")) {
+        el.classList.add("form-input");
+        if (el.tagName === "TEXTAREA") {
+          el.classList.remove("form-input");
+          el.classList.add("form-textarea");
+        }
+      }
+    });
+</script>
+{% endblock %}

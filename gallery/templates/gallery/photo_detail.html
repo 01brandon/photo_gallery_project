@@ -1,0 +1,162 @@
+{% extends 'base.html' %} {% block title %}{{ photo.title }} - Photo Gallery{%
+endblock %} {% block content %}
+<div>
+  <a
+    href="{% url 'home' %}"
+    class="nav-link"
+    style="display: inline-block; margin-bottom: 1rem"
+  >
+    <i class="fas fa-arrow-left"></i> Back to Gallery
+  </a>
+
+  <div
+    style="
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    "
+  >
+    <div>
+      {% if photo.image %}
+      <img
+        src="{{ photo.image.url }}"
+        alt="{{ photo.title }}"
+        style="
+          width: 100%;
+          border-radius: 0.5rem;
+          border: 1px solid var(--border);
+        "
+      />
+      {% else %}
+      <div
+        style="
+          width: 100%;
+          height: 400px;
+          background-color: var(--light);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--secondary);
+          border-radius: 0.5rem;
+          border: 1px solid var(--border);
+        "
+      >
+        No Image Available
+      </div>
+      {% endif %}
+    </div>
+
+    <div>
+      <h1 style="font-size: 2rem; font-weight: 700; margin: 0 0 1rem 0">
+        {{ photo.title }}
+      </h1>
+
+      <div style="margin-bottom: 1.5rem">
+        <p class="text-muted">
+          Uploaded by
+          <a
+            href="{% url 'profile' photo.user.username %}"
+            style="text-decoration: none; color: var(--accent)"
+            >{{ photo.user.username }}</a
+          >
+        </p>
+        <p class="text-muted">{{ photo.created_at|date:"F d, Y H:i" }}</p>
+      </div>
+
+      {% if photo.tags.all %}
+      <div style="margin-bottom: 1.5rem">
+        <p style="font-weight: 500; margin: 0 0 0.5rem 0">Tags</p>
+        <div>
+          {% for tag in photo.tags.all %}
+          <span class="tag-badge">{{ tag.name }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div style="margin-bottom: 1.5rem">
+        <p style="font-weight: 500; margin: 0 0 0.5rem 0">Description</p>
+        <p style="color: var(--secondary); line-height: 1.6">
+          {% if photo.description %} {{ photo.description }} {% else %} No
+          description provided. {% endif %}
+        </p>
+      </div>
+
+      <div
+        style="
+          background-color: white;
+          border: 1px solid var(--border);
+          border-radius: 0.5rem;
+          padding: 1rem;
+          margin-bottom: 1.5rem;
+        "
+      >
+        <div style="display: flex; gap: 2rem">
+          <div style="text-align: center">
+            <div
+              style="font-size: 2rem; font-weight: 700; color: var(--accent)"
+            >
+              {{ likes_count }}
+            </div>
+            <p class="text-muted">Likes</p>
+          </div>
+          <div style="text-align: center">
+            <div
+              style="font-size: 2rem; font-weight: 700; color: var(--secondary)"
+            >
+              {{ dislikes_count }}
+            </div>
+            <p class="text-muted">Dislikes</p>
+          </div>
+        </div>
+      </div>
+
+      {% if user.is_authenticated %}
+      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem">
+        <form
+          method="post"
+          action="{% url 'like_photo' photo.id %}"
+          style="flex: 1"
+        >
+          {% csrf_token %}
+          <button type="submit" class="btn-primary" style="width: 100%">
+            <i class="fas fa-heart"></i>
+            {% if user_like %}Unlike{% else %}Like{% endif %}
+          </button>
+        </form>
+        <form
+          method="post"
+          action="{% url 'dislike_photo' photo.id %}"
+          style="flex: 1"
+        >
+          {% csrf_token %}
+          <button type="submit" class="btn-secondary" style="width: 100%">
+            <i class="fas fa-thumbs-down"></i>
+            {% if user_dislike %}Remove Dislike{% else %}Dislike{% endif %}
+          </button>
+        </form>
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        <a
+          href="{% url 'login' %}"
+          style="text-decoration: none; color: var(--accent)"
+          >Login</a
+        >
+        to like or dislike this photo.
+      </div>
+      {% endif %} {% if user == photo.user %}
+      <div style="display: flex; gap: 1rem">
+        <a href="{% url 'edit_photo' photo.id %}" class="btn-primary">
+          <i class="fas fa-edit"></i> Edit
+        </a>
+        <a href="{% url 'delete_photo' photo.id %}" class="btn-danger">
+          <i class="fas fa-trash"></i> Delete
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

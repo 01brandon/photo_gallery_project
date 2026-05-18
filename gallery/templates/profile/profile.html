@@ -1,0 +1,148 @@
+{% extends 'base.html' %} {% block title %}{{ profile_user.username }} - Photo
+Gallery{% endblock %} {% block content %}
+<div>
+  <div class="card mb-4">
+    <div style="display: flex; gap: 2rem; align-items: flex-start">
+      <div>
+        {% if profile_user.profile_picture %}
+        <img
+          src="{{ profile_user.profile_picture.url }}"
+          alt="{{ profile_user.username }}"
+          class="profile-picture"
+        />
+        {% else %}
+        <div
+          class="profile-picture"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--light);
+            font-size: 2rem;
+          "
+        >
+          <i class="fas fa-user"></i>
+        </div>
+        {% endif %}
+      </div>
+
+      <div style="flex: 1">
+        <h1 style="margin: 0 0 0.5rem 0">{{ profile_user.username }}</h1>
+
+        <p class="text-muted" style="margin: 0 0 1rem 0">
+          {% if profile_user.first_name or profile_user.last_name %} {{
+          profile_user.first_name }} {{ profile_user.last_name }} {% else %} No
+          name provided {% endif %}
+        </p>
+
+        <p class="text-muted" style="margin: 0 0 1rem 0">
+          <i class="fas fa-envelope"></i> {{ profile_user.email }}
+        </p>
+
+        {% if profile_user.bio %}
+        <p style="line-height: 1.6; margin: 0 0 1rem 0">
+          {{ profile_user.bio }}
+        </p>
+        {% endif %}
+
+        <p class="text-muted" style="margin: 0">
+          Joined {{ profile_user.created_at|date:"F d, Y" }}
+        </p>
+
+        {% if user == profile_user %}
+        <div style="display: flex; gap: 1rem; margin-top: 1rem">
+          <a href="{% url 'edit_profile' %}" class="btn-primary"
+            >Edit Profile</a
+          >
+          <a href="{% url 'change_password' %}" class="btn-secondary"
+            >Change Password</a
+          >
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem">
+      Photos ({{ photo_count }})
+    </h2>
+
+    {% if photos %}
+    <div
+      style="
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 2rem;
+      "
+    >
+      {% for photo in photos %}
+      <div class="photo-card">
+        <a
+          href="{% url 'photo_detail' photo.id %}"
+          style="text-decoration: none"
+        >
+          {% if photo.image %}
+          <img src="{{ photo.image.url }}" alt="{{ photo.title }}" />
+          {% else %}
+          <div
+            style="
+              width: 100%;
+              height: 250px;
+              background-color: var(--light);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: var(--secondary);
+            "
+          >
+            No Image
+          </div>
+          {% endif %}
+        </a>
+        <div class="photo-info">
+          <h3
+            style="
+              margin: 0 0 0.5rem 0;
+              font-weight: 600;
+              color: var(--primary);
+            "
+          >
+            <a
+              href="{% url 'photo_detail' photo.id %}"
+              style="text-decoration: none; color: var(--primary)"
+            >
+              {{ photo.title }}
+            </a>
+          </h3>
+
+          {% if photo.tags.all %}
+          <div style="margin-bottom: 0.5rem">
+            {% for tag in photo.tags.all %}
+            <span class="tag-badge">{{ tag.name }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <div class="interaction-buttons">
+            <span style="font-size: 0.875rem; color: var(--secondary)">
+              <i class="fas fa-heart" style="color: var(--error)"></i> {{
+              photo.likes.count }}
+            </span>
+            <span style="font-size: 0.875rem; color: var(--secondary)">
+              <i class="fas fa-thumbs-down" style="color: var(--secondary)"></i>
+              {{ photo.dislikes.count }}
+            </span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="card text-center">
+      <p class="text-muted">This user hasn't uploaded any photos yet.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
